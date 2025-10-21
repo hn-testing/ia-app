@@ -26,9 +26,13 @@
       </ul>
       <ul class="navbar-nav">
         {% if current_user.is_authenticated %}
-        <li class="nav-item"><span class="navbar-text text-white me-3">Logged in as {{ current_user.full_name or current_user.username }} ({{ current_user.role }})</span></li>
-        <li class="nav-item"><a class="nav-link position-relative" href="{{ url_for('query.dashboard') }}">Tasks <span class="badge rounded-pill bg-danger">{{ pending_tasks }}</span></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+  <li class="nav-item"><span class="navbar-text text-white me-3">Logged in as {{ current_user.full_name or current_user.username }} ({{ current_user.role }})</span></li>
+  <li class="nav-item"><a class="nav-link position-relative" href="{{ url_for('query.dashboard') }}">Tasks <span class="badge rounded-pill bg-danger">{{ pending_tasks }}</span></a></li>
+  <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.change_password') }}">Change Password</a></li>
+  {% if current_user.role == 'admin' %}
+  <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.create_user') }}">Create User</a></li>
+  {% endif %}
+  <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
         {% endif %}
       </ul>
     </div>
