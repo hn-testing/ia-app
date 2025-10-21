@@ -42,23 +42,34 @@ Activate your virtual environment `.venv` then install:
 pip install -r requirements.txt
 ```
 
-### 4. Seed data
-```bash
-# only first time, later use only seed.py
+
+### 4. Database migrations (required for new columns)
+If you have changed models (e.g., added `target_user_id` to `AuditTrail`), run:
+```powershell
+$env:FLASK_APP = 'wsgi.py'
 python -m flask db init    # only if migrations folder does not exist yet
 python -m flask db migrate -m "Add target_user_id to audit_trail"
 python -m flask db upgrade
 ```
+
+### 5. Seed data
 ```bash
 python seed.py
 ```
 Creates sample users (auditor1 / employee1 / manager1 all with password `password`), categories, subcategories, and templates.
 
-### 5. Run app
+### 6. Run app (Development)
 ```bash
 python run.py
 ```
 Visit: http://127.0.0.1:5000/login
+
+### 7. Run app (Production with Gunicorn)
+After installing requirements, you can run the app using Gunicorn:
+```bash
+gunicorn --bind 0.0.0.0:8000 wsgi:app
+```
+This will serve your Flask app using the `wsgi.py` entry point on port 8000.
 
 ### 6. Login credentials
 - Auditor: auditor1 / password
