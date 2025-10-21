@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>New Query</h3>
+<form method="post" enctype="multipart/form-data">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="mb-3">
+        <label class="form-label">Category</label>
+        <select name="category" id="category" class="form-select" required>
+          <option value="">-- Select --</option>
+          {% for c in categories %}
+          <option value="{{ c.id }}">{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Subcategory</label>
+        <select name="subcategory" id="subcategory" class="form-select">
+          <option value="">-- Select --</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Template Query (optional)</label>
+        <select name="template" class="form-select">
+          <option value="">-- Select --</option>
+          {% for t in templates %}
+          <option value="{{ t.id }}">{{ t.text[:60] }}{% if t.text|length > 60 %}...{% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Custom Query Text</label>
+        <textarea name="custom_text" class="form-control" rows="4"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Assign Employee (optional)</label>
+        <select name="assigned_employee" class="form-select">
+          <option value="">-- Select --</option>
+          {% for e in employees %}
+          <option value="{{ e.id }}">{{ e.full_name or e.username }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Attachments (multiple allowed)</label>
+        <input type="file" name="attachments" multiple class="form-control" />
+      </div>
+      <button class="btn btn-primary" type="submit">Create Query</button>
+    </div>
+  </div>
+</form>
+<script>
+$('#category').on('change', function() {
+  const catId = $(this).val();
+  $('#subcategory').empty().append('<option value="">-- Select --</option>');
+  if(catId) {
+    $.getJSON(`/subcategories/${catId}`, function(data) {
+      data.forEach(function(sc){
+        $('#subcategory').append(`<option value="${sc.id}">${sc.name}</option>`)
+      });
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,14 @@
+#create an internal auditing app for a bank. the auditing can be from financial or non financial perspective
+
+##Internal auditor can login and raise a query under a category and subcategory. Internal auditor can type a custom query or select from existing list of queries or both. Internal Auditor can also upload supporting files. sub category must be selectable based on category, Template query can be accompanied by Custom query. Internal auditor can assign the query to one of the employees 
+##Employee can add comments and upload supporting files and submit. This will go to Bank manager for approval, if Bank manager rejects, it goes back to the employee with comments. Employee should be able to select Manager from dropdown. 
+##Once bank manager approves, it goes back to Internal Auditor who raised the query to verify and close. The Internal Auditor then can decide to Accept/Close the query or reopen it again (which follows the same workflow again)
+##Audit Trail will be shown for each query for status changes and all the comments
+##Comments can be added by anyone anytime
+
+##add a good ui , show logged in user details and notifications for logged in user's task
+
+##use python flask and postgresql (dbname=test_ia_app1, password = password) and .env file for environment variables, i have created a virtual environment .venv
+##add initial dummy data
+
+# First summarize your steps

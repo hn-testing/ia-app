@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Query #{{ q.id }}</h3>
+<p><strong>Status:</strong> {{ q.status }}</p>
+<p><strong>Category:</strong> {{ q.category.name if q.category_id else '' }} / {{ q.subcategory.name if q.subcategory_id else '' }}</p>
+<p><strong>Template:</strong> {{ q.template.text if q.template_id else 'N/A' }}</p>
+<p><strong>Custom Text:</strong><br>{{ q.custom_text }}</p>
+<p><strong>Assigned Employee:</strong> {{ q.assigned_employee.full_name or q.assigned_employee.username if q.assigned_employee else 'Unassigned' }}</p>
+<p><strong>Assigned Manager:</strong> {{ q.manager.full_name or q.manager.username if q.manager else 'Unassigned' }}</p>
+<hr>
+<h5>Attachments</h5>
+<ul>
+  {% for a in q.attachments %}
+  <li><a href="{{ url_for('query.download_file', filename=a.filename) }}">{{ a.original_name }}</a> ({{ a.uploaded_by.full_name or a.uploaded_by.username }})</li>
+  {% endfor %}
+</ul>
+<hr>
+{% if current_user.role == 'auditor' and q.auditor_id == current_user.id %}
+<form method="post" action="{{ url_for('query.assign_employee', query_id=q.id) }}" class="mb-3">
+  <div class="input-group">
+    <select name="assigned_employee" class="form-select" required>
+      <option value="">-- Assign Employee --</option>
+      {% for e in employees %}
+      <option value="{{ e.id }}">{{ e.full_name or e.username }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-outline-secondary" type="submit">Assign</button>
+  </div>
+</form>
+{% endif %}
+{% if current_user.role == 'employee' and q.assigned_employee_id == current_user.id and q.status in ['assigned','reopened','manager_rejected'] %}
+<h5>Employee Submission</h5>
+<form method="post" action="{{ url_for('query.employee_submit', query_id=q.id) }}" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Select Manager</label>
+    <select name="manager_id" class="form-select" required>
+      <option value="">-- Select --</option>
+      {% for m in managers %}
+      <option value="{{ m.id }}">{{ m.full_name or m.username }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Attachments</label>
+    <input type="file" name="attachments" multiple class="form-control" />
+  </div>
+  <button class="btn btn-primary" type="submit">Submit to Manager</button>
+</form>
+{% endif %}
+{% if current_user.role == 'manager' and q.manager_id == current_user.id and q.status == 'employee_submitted' %}
+<h5>Manager Decision</h5>
+<form method="post" action="{{ url_for('query.manager_decide', query_id=q.id) }}">
+  <button name="decision" value="approve" class="btn btn-success">Approve</button>
+  <button name="decision" value="reject" class="btn btn-danger">Reject</button>
+</form>
+{% endif %}
+{% if current_user.role == 'auditor' and q.auditor_id == current_user.id and q.status == 'manager_approved' %}
+<form method="post" action="{{ url_for('query.auditor_close', query_id=q.id) }}" class="d-inline">
+  <button class="btn btn-success">Close Query</button>
+</form>
+<form method="post" action="{{ url_for('query.auditor_reopen', query_id=q.id) }}" class="d-inline">
+  <button class="btn btn-warning">Reopen</button>
+</form>
+{% endif %}
+<hr>
+<h5>Comments</h5>
+<ul class="list-group mb-3">
+  {% for c in comments %}
+    <li class="list-group-item">
+      <strong>{{ c.user.full_name or c.user.username }}</strong> ({{ c.created_at }})<br>
+      {{ c.content }}
+    </li>
+  {% endfor %}
+</ul>
+<form method="post" action="{{ url_for('query.add_comment', query_id=q.id) }}">
+  <div class="mb-3">
+    <textarea name="comment" class="form-control" rows="3" required></textarea>
+  </div>
+  <button class="btn btn-outline-primary" type="submit">Add Comment</button>
+</form>
+<hr>
+<h5>Audit Trail</h5>
+<ul class="list-group">
+  {% for a in audit_trail %}
+    <li class="list-group-item">
+      {{ a.created_at }} - <strong>{{ a.action }}</strong> - {{ a.detail }}
+      {% if a.user %} | Actor: (ID {{ a.user.id }}) {{ a.user.full_name or a.user.username }}{% endif %}
+      {% if a.target_user %} | Target: (ID {{ a.target_user.id }}) {{ a.target_user.full_name or a.target_user.username }}{% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

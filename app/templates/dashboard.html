@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Your Queries</h3>
+<table class="table table-bordered table-sm">
+  <thead><tr><th>ID</th><th>Category</th><th>Status</th><th>Employee</th><th>Manager</th><th>Actions</th></tr></thead>
+  <tbody>
+  {% for q in queries %}
+    <tr>
+      <td>{{ q.id }}</td>
+      <td>{{ q.category.name if q.category_id else '' }}</td>
+      <td>{{ q.status }}</td>
+      <td>{{ q.assigned_employee.full_name if q.assigned_employee else '' }}</td>
+      <td>{{ q.manager.full_name if q.manager else '' }}</td>
+      <td><a href="{{ url_for('query.view_query', query_id=q.id) }}" class="btn btn-sm btn-outline-primary">Open</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
